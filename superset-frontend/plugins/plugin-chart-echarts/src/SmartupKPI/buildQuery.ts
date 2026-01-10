@@ -17,11 +17,44 @@
  * under the License.
  */
 import { buildQueryContext, QueryFormData } from '@superset-ui/core';
+import {
+  SmartupKPIFormData,
+  TIME_COMPARISON_SHIFTS,
+  TimeComparisonPeriod,
+} from './types';
 
 /**
  * Build query for SmartupKPI visualization.
- * Returns a single row with the metric value.
+ * Handles time comparison queries when enabled.
  */
 export default function buildQuery(formData: QueryFormData) {
-  return buildQueryContext(formData, baseQueryObject => [baseQueryObject]);
+  const smartupFormData = formData as SmartupKPIFormData;
+  const {
+    timeComparisonEnabled,
+    timeComparisonPeriod = 'none',
+    customTimeOffset,
+  } = smartupFormData;
+
+  return buildQueryContext(formData, baseQueryObject => {
+    // If time comparison is not enabled, return simple query
+    if (!timeComparisonEnabled || timeComparisonPeriod === 'none') {
+      return [baseQueryObject];
+    }
+
+    // Get the time shift value
+    let timeShift: string;
+    if (timeComparisonPeriod === 'custom') {
+      timeShift = customTimeOffset || '30 days ago';
+    } else {
+      timeShift = TIME_COMPARISON_SHIFTS[timeComparisonPeriod as TimeComparisonPeriod];
+    }
+
+    // Build query with time_offsets for comparison
+    return [
+      {
+        ...baseQueryObject,
+        time_offsets: timeShift ? [timeShift] : [],
+      },
+    ];
+  });
 }

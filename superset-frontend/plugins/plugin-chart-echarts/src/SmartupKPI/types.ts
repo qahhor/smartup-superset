@@ -23,9 +23,14 @@ import {
   QueryFormData,
   QueryFormMetric,
   ValueFormatter,
+  SimpleAdhocFilter,
 } from '@superset-ui/core';
 import { ColorFormatters } from '@superset-ui/chart-controls';
 import { BaseChartProps, Refs } from '../types';
+
+// =============================================================================
+// NUMBER FORMATTING
+// =============================================================================
 
 /**
  * Number format presets for Smartup24 KPI
@@ -44,14 +49,127 @@ export type SmartupNumberFormatType =
   | 'smart'             // Auto-select based on value
   | 'custom';           // Custom D3 format
 
+// =============================================================================
+// TIME COMPARISON
+// =============================================================================
+
 /**
- * Color threshold configuration
+ * Supported time comparison periods
  */
-export interface SmartupColorThreshold {
+export type TimeComparisonPeriod =
+  | 'DoD'    // Day over Day
+  | 'WoW'    // Week over Week
+  | 'MoM'    // Month over Month
+  | 'QoQ'    // Quarter over Quarter
+  | 'YoY'    // Year over Year
+  | 'custom' // Custom offset
+  | 'none';  // No comparison
+
+/**
+ * Time comparison shift values mapping
+ */
+export const TIME_COMPARISON_SHIFTS: Record<TimeComparisonPeriod, string> = {
+  DoD: '1 day ago',
+  WoW: '1 week ago',
+  MoM: '1 month ago',
+  QoQ: '3 months ago',  // Approximately one quarter
+  YoY: '1 year ago',
+  custom: 'custom',
+  none: '',
+};
+
+/**
+ * Time comparison display labels
+ */
+export const TIME_COMPARISON_LABELS: Record<TimeComparisonPeriod, string> = {
+  DoD: 'vs Yesterday',
+  WoW: 'vs Last Week',
+  MoM: 'vs Last Month',
+  QoQ: 'vs Last Quarter',
+  YoY: 'vs Last Year',
+  custom: 'vs Custom Period',
+  none: '',
+};
+
+/**
+ * Comparison result data
+ */
+export interface ComparisonData {
+  currentValue: number | null;
+  previousValue: number | null;
+  absoluteDifference: number | null;
+  percentDifference: number | null;
+  trend: 'up' | 'down' | 'neutral';
+}
+
+// =============================================================================
+// SPARKLINE
+// =============================================================================
+
+/**
+ * Sparkline configuration
+ */
+export interface SparklineConfig {
+  enabled: boolean;
+  type: 'line' | 'bar' | 'area';
+  color?: string;
+  height?: number;
+  showPoints?: boolean;
+  fillOpacity?: number;
+}
+
+/**
+ * Sparkline data point
+ */
+export interface SparklineDataPoint {
+  timestamp: number | string;
+  value: number | null;
+}
+
+// =============================================================================
+// PROGRESS BAR
+// =============================================================================
+
+/**
+ * Progress bar configuration
+ */
+export interface ProgressBarConfig {
+  enabled: boolean;
+  targetValue: number;
+  showTarget: boolean;
+  showPercentage: boolean;
+  colorBelowTarget?: string;
+  colorAboveTarget?: string;
+  height?: number;
+}
+
+// =============================================================================
+// ALERTS
+// =============================================================================
+
+/**
+ * Alert threshold configuration
+ */
+export interface AlertThreshold {
+  id: string;
+  operator: '<' | '<=' | '>' | '>=' | '==' | '!=';
   value: number;
   color: string;
-  operator: '<' | '<=' | '>' | '>=' | '==' | '!=';
+  icon?: 'warning' | 'error' | 'success' | 'info';
+  message?: string;
 }
+
+/**
+ * Active alert state
+ */
+export interface ActiveAlert {
+  threshold: AlertThreshold;
+  triggered: boolean;
+}
+
+// =============================================================================
+// FORM DATA
+// =============================================================================
 
 /**
  * Form data for SmartupKPI visualization
@@ -78,22 +196,61 @@ export type SmartupKPIFormData = QueryFormData & {
   numberLocale?: 'en' | 'ru' | 'uz';
 
   // Color thresholds
-  colorThresholds?: SmartupColorThreshold[];
-  defaultColor?: string;
-
-  // Conditional formatting (existing Superset feature)
+  defaultColor?: { r: number; g: number; b: number; a: number };
   conditionalFormatting?: any[];
+
+  // Time comparison
+  timeComparisonEnabled?: boolean;
+  timeComparisonPeriod?: TimeComparisonPeriod;
+  customTimeOffset?: string;
+  comparisonColorEnabled?: boolean;
+  comparisonColorScheme?: 'green_up' | 'red_up'; // green_up = green for increase
+  showPreviousValue?: boolean;
+  showAbsoluteDifference?: boolean;
+  showPercentDifference?: boolean;
+
+  // Sparkline
+  sparklineEnabled?: boolean;
+  sparklineType?: 'line' | 'bar' | 'area';
+  sparklineColor?: string;
+  sparklineHeight?: number;
+  sparklineGranularity?: string;
+  sparklinePeriods?: number;
+
+  // Progress bar
+  progressBarEnabled?: boolean;
+  progressBarTarget?: number;
+  progressBarShowTarget?: boolean;
+  progressBarShowPercentage?: boolean;
+  progressBarColorBelow?: string;
+  progressBarColorAbove?: string;
+
+  // Alerts
+  alertsEnabled?: boolean;
+  alertThresholds?: AlertThreshold[];
+
+  // Animation
+  animationEnabled?: boolean;
+  animationDuration?: number;
 
   // Currency
   currencyFormat?: any;
   yAxisFormat?: string;
+
+  // Time filter for comparison
+  time_compare?: string[];
+  start_date_offset?: string;
 };
+
+// =============================================================================
+// CHART DATA
+// =============================================================================
 
 /**
  * Data structure from query response
  */
 export interface SmartupKPIDatum {
-  [key: string]: number | null;
+  [key: string]: number | string | null;
 }
 
 /**
@@ -111,6 +268,10 @@ export type SmartupKPIChartProps = BaseChartProps<SmartupKPIFormData> & {
   queriesData: SmartupKPIChartDataResponseResult[];
 };
 
+// =============================================================================
+// VISUALIZATION PROPS
+// =============================================================================
+
 /**
  * Props for the visualization component
  */
@@ -119,7 +280,7 @@ export interface SmartupKPIVizProps {
   width: number;
   height: number;
 
-  // Data
+  // Main data
   bigNumber?: DataRecordValue;
   metricName?: string;
 
@@ -133,11 +294,35 @@ export interface SmartupKPIVizProps {
   metricNameFontSize?: number;
 
   // Formatting
-  headerFormatter: ValueFormatter;
+  headerFormatter: (value: number) => string;
 
   // Colors
   numberColor?: string;
   colorThresholdFormatters?: ColorFormatters;
+
+  // Comparison
+  comparisonData?: ComparisonData;
+  comparisonLabel?: string;
+  comparisonColorEnabled?: boolean;
+  comparisonColorScheme?: 'green_up' | 'red_up';
+  showPreviousValue?: boolean;
+  showAbsoluteDifference?: boolean;
+  showPercentDifference?: boolean;
+
+  // Sparkline
+  sparklineData?: SparklineDataPoint[];
+  sparklineConfig?: SparklineConfig;
+
+  // Progress bar
+  progressBarConfig?: ProgressBarConfig;
+  currentProgress?: number;
+
+  // Alerts
+  activeAlerts?: ActiveAlert[];
+
+  // Animation
+  animationEnabled?: boolean;
+  animationDuration?: number;
 
   // Interaction
   onContextMenu?: (
@@ -147,6 +332,10 @@ export interface SmartupKPIVizProps {
 
   refs: Refs;
 }
+
+// =============================================================================
+// LOCALE CONFIGURATION
+// =============================================================================
 
 /**
  * Locale configuration for number formatting
@@ -196,7 +385,7 @@ export const SMARTUP_LOCALES: Record<string, SmartupNumberLocale> = {
     decimal: ',',
     thousands: ' ',
     grouping: [3],
-    currency: ['', ' сум'],
+    currency: ['', ' сўм'],
     shortScale: {
       thousands: 'минг',
       millions: 'млн.',
@@ -205,3 +394,47 @@ export const SMARTUP_LOCALES: Record<string, SmartupNumberLocale> = {
     },
   },
 };
+
+// =============================================================================
+// UTILITY TYPES
+// =============================================================================
+
+/**
+ * Color scheme for comparison indicators
+ */
+export enum ComparisonColorScheme {
+  GreenUp = 'green_up',   // Green for positive, red for negative
+  RedUp = 'red_up',       // Red for positive, green for negative (e.g., costs)
+}
+
+/**
+ * Trend direction
+ */
+export type TrendDirection = 'up' | 'down' | 'neutral';
+
+/**
+ * Calculate trend direction from percentage difference
+ */
+export function getTrendDirection(percentDiff: number | null): TrendDirection {
+  if (percentDiff === null || percentDiff === 0) return 'neutral';
+  return percentDiff > 0 ? 'up' : 'down';
+}
+
+/**
+ * Get trend color based on direction and color scheme
+ */
+export function getTrendColor(
+  trend: TrendDirection,
+  scheme: ComparisonColorScheme,
+  theme: { colorSuccess: string; colorError: string; colorTextTertiary: string },
+): string {
+  if (trend === 'neutral') return theme.colorTextTertiary;
+
+  const isPositive = trend === 'up';
+  const greenForPositive = scheme === ComparisonColorScheme.GreenUp;
+
+  if (isPositive) {
+    return greenForPositive ? theme.colorSuccess : theme.colorError;
+  }
+  return greenForPositive ? theme.colorError : theme.colorSuccess;
+}

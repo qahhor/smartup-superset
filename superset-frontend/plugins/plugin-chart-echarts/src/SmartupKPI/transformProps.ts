@@ -23,18 +23,27 @@ import {
 } from '@superset-ui/chart-controls';
 import {
   getMetricLabel,
-  NumberFormats,
-  createDurationFormatter,
   getNumberFormatter,
-  NumberFormatter,
 } from '@superset-ui/core';
 import {
   SmartupKPIChartProps,
   SmartupKPIVizProps,
   SmartupNumberFormatType,
   SMARTUP_LOCALES,
+  ComparisonData,
+  TIME_COMPARISON_SHIFTS,
+  TIME_COMPARISON_LABELS,
+  TimeComparisonPeriod,
+  SparklineConfig,
+  SparklineDataPoint,
+  ProgressBarConfig,
+  getTrendDirection,
 } from './types';
 import { Refs } from '../types';
+
+// =============================================================================
+// UTILITY FUNCTIONS
+// =============================================================================
 
 /**
  * Parse metric value from query response
@@ -88,10 +97,13 @@ function createSmartupFormatter(
 
   // Helper to format with locale separators
   const formatWithLocale = (num: number, decimals: number = 0): string => {
-    const parts = num.toFixed(decimals).split('.');
+    const isNegative = num < 0;
+    const absNum = Math.abs(num);
+    const parts = absNum.toFixed(decimals).split('.');
     const intPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, localeConfig.thousands);
     const decPart = parts[1];
-    return decPart ? `${intPart}${localeConfig.decimal}${decPart}` : intPart;
+    const formatted = decPart ? `${intPart}${localeConfig.decimal}${decPart}` : intPart;
+    return isNegative ? `-${formatted}` : formatted;
   };
 
   // Helper to format large numbers with suffix
@@ -157,7 +169,6 @@ function createSmartupFormatter(
         break;
 
       case 'smart': {
-        // Auto-select format based on value magnitude
         const absValue = Math.abs(value);
         if (absValue >= 1_000_000_000) {
           formattedValue = formatLargeNumber(
@@ -178,7 +189,6 @@ function createSmartupFormatter(
         } else if (absValue >= 1) {
           formattedValue = formatWithLocale(value, 2);
         } else if (absValue > 0) {
-          // Small decimal, likely a percentage
           formattedValue = `${formatWithLocale(value * 100, 1)}%`;
         } else {
           formattedValue = '0';
@@ -187,7 +197,6 @@ function createSmartupFormatter(
       }
 
       case 'custom': {
-        // Use D3 formatter
         try {
           const d3Formatter = getNumberFormatter(customFormat || ',.2f');
           formattedValue = d3Formatter(value);
@@ -201,13 +210,87 @@ function createSmartupFormatter(
         formattedValue = formatWithLocale(value, 0);
     }
 
-    // Add prefix and suffix
     const finalPrefix = prefix || '';
     const finalSuffix = suffix || '';
 
     return `${finalPrefix}${formattedValue}${finalSuffix}`;
   };
 }
+
+/**
+ * Calculate comparison data between current and previous period
+ */
+function calculateComparisonData(
+  currentValue: number | null,
+  previousValue: number | null,
+): ComparisonData {
+  const absoluteDifference =
+    currentValue !== null && previousValue !== null
+      ? currentValue - previousValue
+      : null;
+
+  let percentDifference: number | null = null;
+  if (currentValue !== null && previousValue !== null) {
+    if (previousValue === 0) {
+      percentDifference = currentValue === 0 ? 0 : currentValue > 0 ? 1 : -1;
+    } else {
+      percentDifference = (currentValue - previousValue) / Math.abs(previousValue);
+    }
+  }
+
+  return {
+    currentValue,
+    previousValue,
+    absoluteDifference,
+    percentDifference,
+    trend: getTrendDirection(percentDifference),
+  };
+}
+
+/**
+ * Extract comparison value from data
+ */
+function extractComparisonValue(
+  data: any[],
+  metricName: string,
+  timeShift: string,
+): number | null {
+  if (!data || data.length === 0) return null;
+
+  // Look for the metric with time offset suffix
+  const suffixedKey = `${metricName}__${timeShift}`;
+
+  let total = 0;
+  let found = false;
+
+  data.forEach(row => {
+    Object.keys(row).forEach(key => {
+      if (key === suffixedKey || key.includes(suffixedKey)) {
+        const val = parseMetricValue(row[key]);
+        if (val !== null) {
+          total += val;
+          found = true;
+        }
+      }
+    });
+  });
+
+  return found ? total : null;
+}
+
+/**
+ * Convert color picker value to CSS color string
+ */
+function colorPickerToString(
+  color: { r: number; g: number; b: number; a: number } | undefined,
+): string | undefined {
+  if (!color) return undefined;
+  return `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`;
+}
+
+// =============================================================================
+// TRANSFORM PROPS
+// =============================================================================
 
 /**
  * Transform chart props to visualization props
@@ -226,9 +309,9 @@ export default function transformProps(
 
   const {
     metric = 'value',
-    headerFontSize = 0.4,
-    subtitleFontSize = 0.125,
-    metricNameFontSize = 0.1,
+    headerFontSize = 0.3,
+    subtitleFontSize = 0.08,
+    metricNameFontSize = 0.08,
     showMetricName = true,
     subtitle = '',
     numberFormatType = 'smart',
@@ -238,6 +321,31 @@ export default function transformProps(
     numberLocale = 'ru',
     defaultColor,
     conditionalFormatting,
+
+    // Time comparison
+    timeComparisonEnabled = false,
+    timeComparisonPeriod = 'none',
+    customTimeOffset,
+    comparisonColorEnabled = true,
+    comparisonColorScheme = 'green_up',
+    showPreviousValue = true,
+    showAbsoluteDifference = false,
+    showPercentDifference = true,
+
+    // Sparkline
+    sparklineEnabled = false,
+    sparklineType = 'area',
+    sparklineColor,
+    sparklinePeriods = 7,
+
+    // Progress bar
+    progressBarEnabled = false,
+    progressBarTarget,
+    progressBarShowTarget = true,
+    progressBarShowPercentage = true,
+
+    // Animation
+    animationEnabled = true,
   } = formData;
 
   const refs: Refs = {};
@@ -247,7 +355,36 @@ export default function transformProps(
   // Get metric name and value
   const metricLabel = getMetricLabel(metric);
   const originalLabel = getOriginalLabel(metric, metrics);
-  const bigNumber = data.length === 0 ? null : parseMetricValue(data[0][metricLabel]);
+
+  // Calculate current value (sum all rows for the metric)
+  let currentValue: number | null = null;
+  if (data.length > 0) {
+    let total = 0;
+    let found = false;
+    data.forEach(row => {
+      Object.keys(row).forEach(key => {
+        // Only match the base metric, not the comparison suffix
+        if (key === metricLabel && !key.includes('__')) {
+          const val = parseMetricValue(row[key]);
+          if (val !== null) {
+            total += val;
+            found = true;
+          }
+        }
+      });
+    });
+    // If not found with exact match, try partial match
+    if (!found) {
+      data.forEach(row => {
+        const val = parseMetricValue(row[metricLabel]);
+        if (val !== null) {
+          total += val;
+          found = true;
+        }
+      });
+    }
+    currentValue = found ? total : null;
+  }
 
   // Create formatter
   const headerFormatter = createSmartupFormatter(
@@ -258,12 +395,8 @@ export default function transformProps(
     numberSuffix,
   );
 
-  // Get default color from color picker or use theme default
-  let numberColor: string | undefined;
-  if (defaultColor && typeof defaultColor === 'object') {
-    const { r, g, b, a } = defaultColor as { r: number; g: number; b: number; a: number };
-    numberColor = `rgba(${r}, ${g}, ${b}, ${a})`;
-  }
+  // Get default color
+  const numberColor = colorPickerToString(defaultColor);
 
   // Get color formatters for conditional formatting
   const defaultColorFormatters = [] as ColorFormatters;
@@ -271,12 +404,65 @@ export default function transformProps(
     getColorFormatters(conditionalFormatting, data, theme, false) ??
     defaultColorFormatters;
 
+  // Calculate comparison data if enabled
+  let comparisonData: ComparisonData | undefined;
+  let comparisonLabel: string | undefined;
+
+  if (timeComparisonEnabled && timeComparisonPeriod !== 'none') {
+    const timeShift =
+      timeComparisonPeriod === 'custom'
+        ? customTimeOffset || '30 days ago'
+        : TIME_COMPARISON_SHIFTS[timeComparisonPeriod as TimeComparisonPeriod];
+
+    const previousValue = extractComparisonValue(data, metricLabel, timeShift);
+    comparisonData = calculateComparisonData(currentValue, previousValue);
+    comparisonLabel = TIME_COMPARISON_LABELS[timeComparisonPeriod as TimeComparisonPeriod];
+  }
+
+  // Sparkline config
+  let sparklineConfig: SparklineConfig | undefined;
+  let sparklineData: SparklineDataPoint[] | undefined;
+
+  if (sparklineEnabled) {
+    sparklineConfig = {
+      enabled: true,
+      type: sparklineType as 'line' | 'bar' | 'area',
+      color: colorPickerToString(sparklineColor) || '#2ECC71',
+      height: 40,
+      showPoints: false,
+      fillOpacity: 0.3,
+    };
+    // Note: Sparkline data would come from a time-series query
+    // For now, we'll leave it undefined and handle in the component
+    sparklineData = undefined;
+  }
+
+  // Progress bar config
+  let progressBarConfig: ProgressBarConfig | undefined;
+  let currentProgress: number | undefined;
+
+  if (progressBarEnabled && progressBarTarget) {
+    const targetValue = parseFloat(progressBarTarget) || 100;
+    progressBarConfig = {
+      enabled: true,
+      targetValue,
+      showTarget: progressBarShowTarget,
+      showPercentage: progressBarShowPercentage,
+      colorBelowTarget: '#E74C3C',
+      colorAboveTarget: '#2ECC71',
+      height: 8,
+    };
+    if (currentValue !== null) {
+      currentProgress = (currentValue / targetValue) * 100;
+    }
+  }
+
   const { onContextMenu } = hooks;
 
   return {
     width,
     height,
-    bigNumber,
+    bigNumber: currentValue,
     headerFormatter,
     headerFontSize,
     subtitleFontSize,
@@ -286,6 +472,27 @@ export default function transformProps(
     showMetricName,
     numberColor,
     colorThresholdFormatters,
+
+    // Comparison
+    comparisonData,
+    comparisonLabel,
+    comparisonColorEnabled,
+    comparisonColorScheme,
+    showPreviousValue,
+    showAbsoluteDifference,
+    showPercentDifference,
+
+    // Sparkline
+    sparklineData,
+    sparklineConfig,
+
+    // Progress bar
+    progressBarConfig,
+    currentProgress,
+
+    // Animation
+    animationEnabled,
+
     onContextMenu,
     refs,
   };
