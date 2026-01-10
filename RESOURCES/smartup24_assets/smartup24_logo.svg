@@ -1,0 +1,13 @@
+<svg width="150" height="32" viewBox="0 0 150 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Smartup24 Logo Placeholder -->
+  <!-- Replace this file with your actual logo -->
+
+  <!-- Icon -->
+  <rect x="0" y="4" width="24" height="24" rx="6" fill="#0066CC"/>
+  <path d="M7 16L11 20L17 12" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Text: Smartup24 -->
+  <text x="32" y="22" font-family="Inter, system-ui, sans-serif" font-size="16" font-weight="600" fill="#111827">
+    Smartup24
+  </text>
+</svg>
