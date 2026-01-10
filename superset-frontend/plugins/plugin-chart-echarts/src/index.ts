@@ -39,6 +39,7 @@ export {
   BigNumberTotalChartPlugin,
   BigNumberPeriodOverPeriodChartPlugin,
 } from './BigNumber';
+export { default as SmartupKPIChartPlugin } from './SmartupKPI';
 export { default as EchartsSunburstChartPlugin } from './Sunburst';
 export { default as EchartsBubbleChartPlugin } from './Bubble';
 export { default as EchartsSankeyChartPlugin } from './Sankey';

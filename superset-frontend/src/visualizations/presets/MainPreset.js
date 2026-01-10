@@ -69,6 +69,7 @@ import {
   BigNumberPeriodOverPeriodChartPlugin,
   EchartsHeatmapChartPlugin,
   EchartsGanttChartPlugin,
+  SmartupKPIChartPlugin,
 } from '@superset-ui/plugin-chart-echarts';
 import {
   SelectFilterPlugin,
@@ -106,6 +107,9 @@ export default class MainPreset extends Preset {
         new BigNumberChartPlugin().configure({ key: VizType.BigNumber }),
         new BigNumberTotalChartPlugin().configure({
           key: VizType.BigNumberTotal,
+        }),
+        new SmartupKPIChartPlugin().configure({
+          key: VizType.SmartupKPI,
         }),
         new EchartsBoxPlotChartPlugin().configure({ key: VizType.BoxPlot }),
         new BubbleChartPlugin().configure({ key: VizType.LegacyBubble }),
