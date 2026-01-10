@@ -1,13 +1,21 @@
-<svg width="150" height="32" viewBox="0 0 150 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Smartup24 Logo Placeholder -->
-  <!-- Replace this file with your actual logo -->
+<svg width="180" height="40" viewBox="0 0 180 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Smartup24 Logo based on brand guidelines (smartup_24_cutguide.pdf) -->
 
-  <!-- Icon -->
-  <rect x="0" y="4" width="24" height="24" rx="6" fill="#0066CC"/>
-  <path d="M7 16L11 20L17 12" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Graphic Mark - stylized "24" -->
+  <g transform="translate(2, 2)">
+    <!-- Main rounded shape -->
+    <path d="M18 0C26.284 0 33 6.716 33 15V21C33 29.284 26.284 36 18 36H15C6.716 36 0 29.284 0 21V15C0 6.716 6.716 0 15 0H18Z" fill="#2ECC71"/>
 
-  <!-- Text: Smartup24 -->
-  <text x="32" y="22" font-family="Inter, system-ui, sans-serif" font-size="16" font-weight="600" fill="#111827">
-    Smartup24
-  </text>
+    <!-- Blue circle (2 element) -->
+    <circle cx="12" cy="13" r="9" fill="#009EE0"/>
+
+    <!-- Black diagonal (connecting element) -->
+    <path d="M17 5L33 21V5H17Z" fill="#1A1A1A"/>
+
+    <!-- Black rectangle (4 element base) -->
+    <rect x="15" y="26" width="14" height="10" rx="2" fill="#1A1A1A"/>
+  </g>
+
+  <!-- Text: smartup24 -->
+  <text x="46" y="28" font-family="Montserrat, Circe, sans-serif" font-size="18" font-weight="500" letter-spacing="-0.5" fill="#1A1A1A">smartup24</text>
 </svg>

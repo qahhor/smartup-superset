@@ -45,18 +45,19 @@ EXTRA_CUSTOM_CSS = """
    -------------------------------------------------------------------------- */
 
 :root {
-  /* Brand Colors */
-  --smartup24-primary: #0066CC;
-  --smartup24-primary-hover: #0052A3;
-  --smartup24-primary-active: #004080;
-  --smartup24-secondary: #6B7280;
-  --smartup24-accent: #10B981;
+  /* Brand Colors (from smartup_24_cutguide.pdf) */
+  --smartup24-primary: #2ECC71;
+  --smartup24-primary-hover: #27AE60;
+  --smartup24-primary-active: #229954;
+  --smartup24-secondary: #009EE0;
+  --smartup24-accent: #2ECC71;
+  --smartup24-black: #1A1A1A;
 
   /* Semantic Colors */
-  --smartup24-success: #10B981;
-  --smartup24-warning: #F59E0B;
-  --smartup24-error: #EF4444;
-  --smartup24-info: #3B82F6;
+  --smartup24-success: #2ECC71;
+  --smartup24-warning: #F5A623;
+  --smartup24-error: #E74C3C;
+  --smartup24-info: #009EE0;
 
   /* Neutrals */
   --smartup24-bg-base: #FFFFFF;

@@ -46,49 +46,49 @@ from typing import Any
 # - Test colors in both light and dark modes
 
 SMARTUP24_COLORS = {
-    # Primary Brand Colors
-    # ---------------------
-    # Main brand color - used for primary actions, links, active states
-    "primary": "#0066CC",  # TODO: Replace with Smartup24 primary color
+    # Primary Brand Colors (from smartup_24_cutguide.pdf)
+    # ---------------------------------------------------
+    # Green - Main brand color for primary actions, buttons, active states
+    "primary": "#2ECC71",  # Smartup24 Green
 
     # Secondary/Accent Colors
     # -----------------------
-    "secondary": "#6B7280",  # Neutral gray for secondary elements
-    "accent": "#10B981",     # Accent for highlights, success indicators
+    "secondary": "#009EE0",   # Smartup24 Blue/Cyan
+    "accent": "#2ECC71",      # Green accent
 
     # Semantic Colors
     # ---------------
-    # These colors convey meaning - adjust while maintaining their purpose
-    "success": "#10B981",    # Green - successful operations, positive metrics
-    "warning": "#F59E0B",    # Amber - warnings, attention needed
-    "error": "#EF4444",      # Red - errors, critical alerts
-    "info": "#3B82F6",       # Blue - informational messages
+    # Aligned with brand palette
+    "success": "#2ECC71",    # Smartup24 Green - successful operations
+    "warning": "#F5A623",    # Amber - warnings, attention needed
+    "error": "#E74C3C",      # Red - errors, critical alerts
+    "info": "#009EE0",       # Smartup24 Blue - informational messages
 
     # Neutral Colors
     # --------------
-    # Grayscale palette for text, backgrounds, borders
-    "neutral_50": "#F9FAFB",   # Lightest - elevated backgrounds
-    "neutral_100": "#F3F4F6",  # Light backgrounds
-    "neutral_200": "#E5E7EB",  # Borders, dividers
-    "neutral_300": "#D1D5DB",  # Disabled states
-    "neutral_400": "#9CA3AF",  # Placeholder text
-    "neutral_500": "#6B7280",  # Secondary text
-    "neutral_600": "#4B5563",  # Body text
-    "neutral_700": "#374151",  # Headings
-    "neutral_800": "#1F2937",  # Dark text
-    "neutral_900": "#111827",  # Darkest - primary text
+    # Grayscale palette with black accent from brand
+    "neutral_50": "#F8F9FA",   # Lightest - elevated backgrounds
+    "neutral_100": "#F1F3F5",  # Light backgrounds
+    "neutral_200": "#E9ECEF",  # Borders, dividers
+    "neutral_300": "#DEE2E6",  # Disabled states
+    "neutral_400": "#ADB5BD",  # Placeholder text
+    "neutral_500": "#6C757D",  # Secondary text
+    "neutral_600": "#495057",  # Body text
+    "neutral_700": "#343A40",  # Headings
+    "neutral_800": "#212529",  # Dark text
+    "neutral_900": "#1A1A1A",  # Smartup24 Black - primary text
 
     # Chart Colors
     # ------------
-    # Sequential palette for data visualization
-    "chart_1": "#0066CC",
-    "chart_2": "#10B981",
-    "chart_3": "#F59E0B",
-    "chart_4": "#EF4444",
-    "chart_5": "#8B5CF6",
-    "chart_6": "#EC4899",
-    "chart_7": "#06B6D4",
-    "chart_8": "#84CC16",
+    # Brand-aligned palette for data visualization
+    "chart_1": "#2ECC71",  # Smartup24 Green
+    "chart_2": "#009EE0",  # Smartup24 Blue
+    "chart_3": "#1A1A1A",  # Smartup24 Black
+    "chart_4": "#F5A623",  # Amber
+    "chart_5": "#E74C3C",  # Red
+    "chart_6": "#9B59B6",  # Purple
+    "chart_7": "#3498DB",  # Light Blue
+    "chart_8": "#1ABC9C",  # Teal
 }
 
 # =============================================================================
@@ -97,11 +97,11 @@ SMARTUP24_COLORS = {
 # Font configuration - update based on your brand typography
 
 SMARTUP24_TYPOGRAPHY = {
-    # Primary Font Family
-    # -------------------
-    # Main font for UI elements and body text
-    # Options: 'Inter', 'Roboto', 'Open Sans', 'Nunito', etc.
-    "font_family": "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+    # Primary Font Family (from smartup_24_cutguide.pdf)
+    # --------------------------------------------------
+    # Brand fonts: Circe (primary), Montserrat (secondary)
+    # Using Montserrat as web fallback since Circe requires license
+    "font_family": "Montserrat, 'Circe', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
 
     # Code Font Family
     # ----------------
@@ -110,25 +110,25 @@ SMARTUP24_TYPOGRAPHY = {
 
     # Font URLs
     # ---------
-    # Google Fonts or other CDN URLs for custom fonts
-    # These will be loaded when the theme is applied
+    # Google Fonts - Montserrat (brand-approved alternative to Circe)
     "font_urls": [
-        "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap",
+        "https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap",
         "https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap",
     ],
 
-    # Font Sizes
-    # ----------
+    # Font Sizes (from brand guideline ratios)
+    # ----------------------------------------
+    # Base: 15pt = 100%, Heading: 40pt, Subheading: 30pt, Accent: 20pt
     "font_size_xs": "10",
     "font_size_sm": "12",
     "font_size_base": "14",
     "font_size_lg": "16",
     "font_size_xl": "20",
     "font_size_xxl": "28",
-    "font_size_heading_1": "38",
-    "font_size_heading_2": "30",
+    "font_size_heading_1": "40",  # 100% - Main heading
+    "font_size_heading_2": "30",  # 75% - Subheading
     "font_size_heading_3": "24",
-    "font_size_heading_4": "20",
+    "font_size_heading_4": "20",  # 50% - Accent text
     "font_size_heading_5": "16",
 
     # Font Weights
