@@ -1,21 +1,37 @@
-<svg width="180" height="40" viewBox="0 0 180 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Smartup24 Logo based on brand guidelines (smartup_24_cutguide.pdf) -->
+<svg width="220" height="48" viewBox="0 0 220 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Smartup Logo - Official design -->
 
-  <!-- Graphic Mark - stylized "24" -->
-  <g transform="translate(2, 2)">
-    <!-- Main rounded shape -->
-    <path d="M18 0C26.284 0 33 6.716 33 15V21C33 29.284 26.284 36 18 36H15C6.716 36 0 29.284 0 21V15C0 6.716 6.716 0 15 0H18Z" fill="#2ECC71"/>
+  <!-- Graphic Mark - Circle divided into 4 quarters -->
+  <g transform="translate(4, 4)">
+    <!-- Circle base clipping -->
+    <clipPath id="circleClip">
+      <circle cx="20" cy="20" r="20"/>
+    </clipPath>
 
-    <!-- Blue circle (2 element) -->
-    <circle cx="12" cy="13" r="9" fill="#009EE0"/>
+    <g clip-path="url(#circleClip)">
+      <!-- Top-left quarter: Black -->
+      <path d="M0 0H20V20H0V0Z" fill="#1A1A1A"/>
 
-    <!-- Black diagonal (connecting element) -->
-    <path d="M17 5L33 21V5H17Z" fill="#1A1A1A"/>
+      <!-- Top-right quarter: Green -->
+      <path d="M20 0H40V20H20V0Z" fill="#2ECC71"/>
 
-    <!-- Black rectangle (4 element base) -->
-    <rect x="15" y="26" width="14" height="10" rx="2" fill="#1A1A1A"/>
+      <!-- Bottom-left quarter: Blue -->
+      <path d="M0 20H20V40H0V20Z" fill="#009EE0"/>
+
+      <!-- Bottom-right quarter: Black -->
+      <path d="M20 20H40V40H20V20Z" fill="#1A1A1A"/>
+    </g>
+
+    <!-- Circle outline (optional, for crisp edges) -->
+    <circle cx="20" cy="20" r="20" fill="none"/>
   </g>
 
-  <!-- Text: smartup24 -->
-  <text x="46" y="28" font-family="Montserrat, Circe, sans-serif" font-size="18" font-weight="500" letter-spacing="-0.5" fill="#1A1A1A">smartup24</text>
+  <!-- Text badge: "smartup" on black rounded rectangle -->
+  <g transform="translate(54, 4)">
+    <!-- Black rounded rectangle background -->
+    <rect width="160" height="40" rx="20" fill="#1A1A1A"/>
+
+    <!-- Text: smartup (white) -->
+    <text x="80" y="27" font-family="Montserrat, Circe, sans-serif" font-size="20" font-weight="400" text-anchor="middle" fill="#FFFFFF">smartup</text>
+  </g>
 </svg>
