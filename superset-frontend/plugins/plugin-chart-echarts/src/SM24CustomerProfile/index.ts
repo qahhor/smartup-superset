@@ -20,8 +20,8 @@ import { t, ChartMetadata, ChartPlugin, Behavior } from '@superset-ui/core';
 import buildQuery from './buildQuery';
 import controlPanel from './controlPanel';
 import transformProps from './transformProps';
-// Placeholder thumbnail - will use Table images temporarily
-import thumbnail from '../Table/images/Table.jpg';
+// Placeholder thumbnail - reuse BigNumber images
+import thumbnail from '../BigNumber/BigNumberTotal/images/thumbnail.png';
 
 const metadata = new ChartMetadata({
   name: t('SM24-CustomerProfile'),

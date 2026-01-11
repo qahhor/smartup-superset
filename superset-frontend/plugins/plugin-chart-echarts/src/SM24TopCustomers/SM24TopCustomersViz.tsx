@@ -17,12 +17,8 @@
  * under the License.
  */
 import { useCallback, useMemo, useState, MouseEvent } from 'react';
-import {
-  styled,
-  BinaryQueryObjectFilterClause,
-  useTheme,
-  css,
-} from '@superset-ui/core';
+import { BinaryQueryObjectFilterClause } from '@superset-ui/core';
+import { styled, useTheme, css } from '@apache-superset/core/ui';
 import {
   SM24TopCustomersVizProps,
   CustomerData,

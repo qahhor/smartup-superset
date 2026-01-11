@@ -17,7 +17,7 @@
  * under the License.
  */
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { styled, useTheme } from '@superset-ui/core';
+import { styled, useTheme } from '@apache-superset/core/ui';
 import { init } from 'echarts';
 import type { ECharts, EChartsOption, SeriesOption } from 'echarts';
 import {
