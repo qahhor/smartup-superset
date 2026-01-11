@@ -70,6 +70,7 @@ import {
   EchartsHeatmapChartPlugin,
   EchartsGanttChartPlugin,
   SM24BigNumberChartPlugin,
+  SM24TopBlockChartPlugin,
 } from '@superset-ui/plugin-chart-echarts';
 import {
   SelectFilterPlugin,
@@ -110,6 +111,9 @@ export default class MainPreset extends Preset {
         }),
         new SM24BigNumberChartPlugin().configure({
           key: VizType.SM24BigNumber,
+        }),
+        new SM24TopBlockChartPlugin().configure({
+          key: VizType.SM24TopBlock,
         }),
         new EchartsBoxPlotChartPlugin().configure({ key: VizType.BoxPlot }),
         new BubbleChartPlugin().configure({ key: VizType.LegacyBubble }),

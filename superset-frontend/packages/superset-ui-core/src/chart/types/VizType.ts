@@ -52,6 +52,7 @@ export enum VizType {
   Sankey = 'sankey_v2',
   Scatter = 'echarts_timeseries_scatter',
   SM24BigNumber = 'sm24_big_number',
+  SM24TopBlock = 'sm24_top_block',
   SmoothLine = 'echarts_timeseries_smooth',
   Step = 'echarts_timeseries_step',
   Sunburst = 'sunburst_v2',
