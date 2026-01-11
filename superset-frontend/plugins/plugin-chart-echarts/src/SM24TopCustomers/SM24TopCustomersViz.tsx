@@ -17,7 +17,12 @@
  * under the License.
  */
 import { useCallback, useMemo, useState, MouseEvent } from 'react';
-import { styled, BinaryQueryObjectFilterClause } from '@superset-ui/core';
+import {
+  styled,
+  BinaryQueryObjectFilterClause,
+  useTheme,
+  css,
+} from '@superset-ui/core';
 import {
   SM24TopCustomersVizProps,
   CustomerData,
@@ -32,37 +37,42 @@ import {
 // =============================================================================
 
 const Container = styled.div<{ height: number }>`
-  display: flex;
-  flex-direction: column;
-  height: ${({ height }) => height}px;
-  font-family: ${({ theme }) =>
-    theme.typography?.families?.sansSerif || 'Inter, Helvetica, Arial, sans-serif'};
-  background: #fff;
-  border-radius: 8px;
-  overflow: hidden;
+  ${({ height, theme }) => css`
+    display: flex;
+    flex-direction: column;
+    height: ${height}px;
+    font-family: ${theme.typography.families.sansSerif};
+    background: ${theme.colors.grayscale.light5};
+    border-radius: ${theme.borderRadius}px;
+    overflow: hidden;
+  `}
 `;
 
 const Header = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 16px;
-  border-bottom: 1px solid #eee;
-  background: #fafafa;
+  ${({ theme }) => css`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: ${theme.gridUnit * 3}px ${theme.gridUnit * 4}px;
+    border-bottom: 1px solid ${theme.colors.grayscale.light3};
+    background: ${theme.colors.grayscale.light4};
+  `}
 `;
 
 const SearchBox = styled.input`
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  width: 250px;
-  font-size: 13px;
-  outline: none;
+  ${({ theme }) => css`
+    padding: ${theme.gridUnit * 2}px ${theme.gridUnit * 3}px;
+    border: 1px solid ${theme.colors.grayscale.light2};
+    border-radius: ${theme.borderRadius}px;
+    width: 250px;
+    font-size: ${theme.typography.sizes.s}px;
+    outline: none;
 
-  &:focus {
-    border-color: #3498db;
-    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
-  }
+    &:focus {
+      border-color: ${theme.colors.primary.base};
+      box-shadow: 0 0 0 2px ${theme.colors.primary.light2};
+    }
+  `}
 `;
 
 const AlertBadge = styled.div<{ color: string }>`
@@ -89,22 +99,26 @@ const Table = styled.table`
 `;
 
 const Th = styled.th<{ sortable?: boolean; width?: number }>`
-  position: sticky;
-  top: 0;
-  background: #f8f9fa;
-  padding: 10px 12px;
-  text-align: left;
-  font-weight: 600;
-  color: #2c3e50;
-  border-bottom: 2px solid #e9ecef;
-  white-space: nowrap;
-  cursor: ${({ sortable }) => (sortable ? 'pointer' : 'default')};
-  width: ${({ width }) => (width ? `${width}px` : 'auto')};
-  user-select: none;
+  ${({ sortable, width, theme }) => css`
+    position: sticky;
+    top: 0;
+    background: ${theme.colors.grayscale.light4};
+    padding: ${theme.gridUnit * 2.5}px ${theme.gridUnit * 3}px;
+    text-align: left;
+    font-weight: ${theme.typography.weights.bold};
+    color: ${theme.colors.grayscale.dark2};
+    border-bottom: 2px solid ${theme.colors.grayscale.light3};
+    white-space: nowrap;
+    cursor: ${sortable ? 'pointer' : 'default'};
+    width: ${width ? `${width}px` : 'auto'};
+    user-select: none;
 
-  &:hover {
-    background: ${({ sortable }) => (sortable ? '#e9ecef' : '#f8f9fa')};
-  }
+    &:hover {
+      background: ${sortable
+        ? theme.colors.grayscale.light3
+        : theme.colors.grayscale.light4};
+    }
+  `}
 `;
 
 const Tr = styled.tr<{
@@ -112,19 +126,22 @@ const Tr = styled.tr<{
   isRenewalUrgent?: boolean;
   isTopTen?: boolean;
 }>`
-  background: ${({ isRenewalUrgent }) => (isRenewalUrgent ? '#FFF9E6' : '#fff')};
-  border-bottom: 1px solid #eee;
+  ${({ isRenewalUrgent, isAtRisk, theme }) => css`
+    background: ${isRenewalUrgent
+      ? theme.colors.warning.light2
+      : theme.colors.grayscale.light5};
+    border-bottom: 1px solid ${theme.colors.grayscale.light3};
 
-  &:hover {
-    background: #f5f8fa;
-  }
-
-  ${({ isAtRisk }) =>
-    isAtRisk &&
-    `
-    .customer-name {
-      font-weight: 700;
+    &:hover {
+      background: ${theme.colors.grayscale.light4};
     }
+
+    ${isAtRisk &&
+    css`
+      .customer-name {
+        font-weight: ${theme.typography.weights.bold};
+      }
+    `}
   `}
 `;
 
@@ -141,18 +158,24 @@ const CustomerNameCell = styled.div`
 `;
 
 const StarIcon = styled.span`
-  color: #f1c40f;
-  font-size: 14px;
+  ${({ theme }) => css`
+    color: ${theme.colors.warning.base};
+    font-size: ${theme.typography.sizes.m}px;
+  `}
 `;
 
 const CustomerLink = styled.span<{ clickable?: boolean }>`
-  color: ${({ clickable }) => (clickable ? '#3498db' : '#2c3e50')};
-  cursor: ${({ clickable }) => (clickable ? 'pointer' : 'default')};
-  font-weight: 500;
+  ${({ clickable, theme }) => css`
+    color: ${clickable
+      ? theme.colors.primary.base
+      : theme.colors.grayscale.dark2};
+    cursor: ${clickable ? 'pointer' : 'default'};
+    font-weight: ${theme.typography.weights.medium};
 
-  &:hover {
-    text-decoration: ${({ clickable }) => (clickable ? 'underline' : 'none')};
-  }
+    &:hover {
+      text-decoration: ${clickable ? 'underline' : 'none'};
+    }
+  `}
 `;
 
 const SegmentBadge = styled.span<{ color: string }>`
@@ -167,9 +190,14 @@ const SegmentBadge = styled.span<{ color: string }>`
 `;
 
 const GrowthCell = styled.span<{ positive?: boolean; negative?: boolean }>`
-  color: ${({ positive, negative }) =>
-    positive ? '#27AE60' : negative ? '#E74C3C' : '#95A5A6'};
-  font-weight: 500;
+  ${({ positive, negative, theme }) => css`
+    color: ${positive
+      ? theme.colors.success.base
+      : negative
+        ? theme.colors.error.base
+        : theme.colors.grayscale.base};
+    font-weight: ${theme.typography.weights.medium};
+  `}
 `;
 
 const ProductPill = styled.span<{ color: string }>`
@@ -191,23 +219,25 @@ const RegionCell = styled.span`
 `;
 
 const HealthBar = styled.div<{ score: number; color: string }>`
-  width: 60px;
-  height: 8px;
-  background: #eee;
-  border-radius: 4px;
-  overflow: hidden;
-  position: relative;
+  ${({ score, color, theme }) => css`
+    width: 60px;
+    height: 8px;
+    background: ${theme.colors.grayscale.light3};
+    border-radius: ${theme.borderRadius}px;
+    overflow: hidden;
+    position: relative;
 
-  &::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    height: 100%;
-    width: ${({ score }) => score}%;
-    background: ${({ color }) => color};
-    border-radius: 4px;
-  }
+    &::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: ${score}%;
+      background: ${color};
+      border-radius: ${theme.borderRadius}px;
+    }
+  `}
 `;
 
 const HealthCell = styled.div`
@@ -217,42 +247,61 @@ const HealthCell = styled.div`
 `;
 
 const RenewalCell = styled.div<{ urgent?: boolean; upcoming?: boolean }>`
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  color: ${({ urgent, upcoming }) =>
-    urgent ? '#E74C3C' : upcoming ? '#F39C12' : '#2c3e50'};
-  font-weight: ${({ urgent }) => (urgent ? '600' : 'normal')};
+  ${({ urgent, upcoming, theme }) => css`
+    display: flex;
+    align-items: center;
+    gap: ${theme.gridUnit}px;
+    color: ${urgent
+      ? theme.colors.error.base
+      : upcoming
+        ? theme.colors.warning.base
+        : theme.colors.grayscale.dark2};
+    font-weight: ${urgent
+      ? theme.typography.weights.bold
+      : theme.typography.weights.normal};
+  `}
 `;
 
 const ActivityCell = styled.div<{ alert?: boolean }>`
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  color: ${({ alert }) => (alert ? '#E74C3C' : '#2c3e50')};
+  ${({ alert, theme }) => css`
+    display: flex;
+    align-items: center;
+    gap: ${theme.gridUnit}px;
+    color: ${alert ? theme.colors.error.base : theme.colors.grayscale.dark2};
+  `}
 `;
 
 const NpsBadge = styled.span<{ score: number }>`
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 10px;
-  font-size: 11px;
-  font-weight: 600;
-  background: ${({ score }) =>
-    score >= 50 ? '#27AE60' : score >= 0 ? '#F1C40F' : '#E74C3C'}20;
-  color: ${({ score }) =>
-    score >= 50 ? '#27AE60' : score >= 0 ? '#F1C40F' : '#E74C3C'};
+  ${({ score, theme }) => {
+    const npsColor =
+      score >= 50
+        ? theme.colors.success.base
+        : score >= 0
+          ? theme.colors.warning.base
+          : theme.colors.error.base;
+    return css`
+      display: inline-block;
+      padding: 2px ${theme.gridUnit * 2}px;
+      border-radius: 10px;
+      font-size: ${theme.typography.sizes.xs}px;
+      font-weight: ${theme.typography.weights.bold};
+      background: ${npsColor}20;
+      color: ${npsColor};
+    `;
+  }}
 `;
 
 const Footer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 16px;
-  border-top: 1px solid #eee;
-  background: #fafafa;
-  font-size: 12px;
-  color: #666;
+  ${({ theme }) => css`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: ${theme.gridUnit * 3}px ${theme.gridUnit * 4}px;
+    border-top: 1px solid ${theme.colors.grayscale.light3};
+    background: ${theme.colors.grayscale.light4};
+    font-size: ${theme.typography.sizes.s}px;
+    color: ${theme.colors.grayscale.base};
+  `}
 `;
 
 const FooterStats = styled.div`
@@ -267,15 +316,19 @@ const FooterStat = styled.div`
 `;
 
 const FooterStatLabel = styled.span`
-  color: #999;
-  font-size: 10px;
-  text-transform: uppercase;
+  ${({ theme }) => css`
+    color: ${theme.colors.grayscale.light1};
+    font-size: ${theme.typography.sizes.xs}px;
+    text-transform: uppercase;
+  `}
 `;
 
 const FooterStatValue = styled.span<{ color?: string }>`
-  font-weight: 600;
-  font-size: 14px;
-  color: ${({ color }) => color || '#2c3e50'};
+  ${({ color, theme }) => css`
+    font-weight: ${theme.typography.weights.bold};
+    font-size: ${theme.typography.sizes.m}px;
+    color: ${color || theme.colors.grayscale.dark2};
+  `}
 `;
 
 const QuickActions = styled.div`
@@ -284,20 +337,22 @@ const QuickActions = styled.div`
 `;
 
 const ActionButton = styled.button`
-  padding: 6px 12px;
-  border: 1px solid #ddd;
-  background: #fff;
-  border-radius: 4px;
-  font-size: 11px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 4px;
+  ${({ theme }) => css`
+    padding: ${theme.gridUnit * 1.5}px ${theme.gridUnit * 3}px;
+    border: 1px solid ${theme.colors.grayscale.light2};
+    background: ${theme.colors.grayscale.light5};
+    border-radius: ${theme.borderRadius}px;
+    font-size: ${theme.typography.sizes.xs}px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: ${theme.gridUnit}px;
 
-  &:hover {
-    background: #f5f5f5;
-    border-color: #ccc;
-  }
+    &:hover {
+      background: ${theme.colors.grayscale.light4};
+      border-color: ${theme.colors.grayscale.light1};
+    }
+  `}
 `;
 
 // =============================================================================
@@ -306,11 +361,11 @@ const ActionButton = styled.button`
 
 function SM24TopCustomersViz({
   className = '',
-  width,
+  width: _width,
   height,
   customers,
   summary,
-  columns,
+  columns: _columns,
   enableSearch,
   showFooterSummary,
   showConcentrationAlert,
@@ -327,6 +382,7 @@ function SM24TopCustomersViz({
   onContextMenu,
   formData,
 }: SM24TopCustomersVizProps) {
+  const theme = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
   const [sortColumn, setSortColumn] = useState<string>('totalArr');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
@@ -449,14 +505,20 @@ function SM24TopCustomersViz({
       const drillByFilters: BinaryQueryObjectFilterClause[] = [];
 
       if (groupby.length > 0) {
-        if (formData.customerIdColumn && groupby.includes(formData.customerIdColumn)) {
+        if (
+          formData.customerIdColumn &&
+          groupby.includes(formData.customerIdColumn)
+        ) {
           drillByFilters.push({
             col: formData.customerIdColumn,
             op: '==',
             val: customer.customerId,
           });
         }
-        if (formData.industryColumn && groupby.includes(formData.industryColumn)) {
+        if (
+          formData.industryColumn &&
+          groupby.includes(formData.industryColumn)
+        ) {
           drillByFilters.push({
             col: formData.industryColumn,
             op: '==',
@@ -506,19 +568,20 @@ function SM24TopCustomersViz({
         )}
 
         {showConcentrationAlert && (
-          <AlertBadge color="#E74C3C">
-            ⚠️ High Concentration: Top 10 = {summary.topTenConcentration.toFixed(1)}% of ARR
+          <AlertBadge color={theme.colors.error.base}>
+            ⚠️ High Concentration: Top 10 ={' '}
+            {summary.topTenConcentration.toFixed(1)}% of ARR
           </AlertBadge>
         )}
 
         {summary.criticalRenewals > 0 && (
-          <AlertBadge color="#E74C3C">
+          <AlertBadge color={theme.colors.error.base}>
             🔴 {summary.criticalRenewals} Critical Renewals
           </AlertBadge>
         )}
 
         {summary.upcomingRenewals > 0 && (
-          <AlertBadge color="#F39C12">
+          <AlertBadge color={theme.colors.warning.base}>
             🟡 {summary.upcomingRenewals} Upcoming Renewals
           </AlertBadge>
         )}
@@ -536,7 +599,11 @@ function SM24TopCustomersViz({
               <Th sortable width={120} onClick={() => handleSort('totalArr')}>
                 ARR{renderSortIndicator('totalArr')}
               </Th>
-              <Th sortable width={90} onClick={() => handleSort('arrGrowthMom')}>
+              <Th
+                sortable
+                width={90}
+                onClick={() => handleSort('arrGrowthMom')}
+              >
                 MoM{renderSortIndicator('arrGrowthMom')}
               </Th>
               <Th width={180}>Products</Th>
@@ -545,10 +612,18 @@ function SM24TopCustomersViz({
               <Th sortable width={100} onClick={() => handleSort('tenure')}>
                 Tenure{renderSortIndicator('tenure')}
               </Th>
-              <Th sortable width={120} onClick={() => handleSort('healthScore')}>
+              <Th
+                sortable
+                width={120}
+                onClick={() => handleSort('healthScore')}
+              >
                 Health{renderSortIndicator('healthScore')}
               </Th>
-              <Th sortable width={110} onClick={() => handleSort('renewalDate')}>
+              <Th
+                sortable
+                width={110}
+                onClick={() => handleSort('renewalDate')}
+              >
                 Renewal{renderSortIndicator('renewalDate')}
               </Th>
               <Th width={120}>CSM</Th>
@@ -561,14 +636,18 @@ function SM24TopCustomersViz({
               <Tr
                 key={customer.customerId}
                 isAtRisk={highlightAtRisk && customer.isAtRisk}
-                isRenewalUrgent={highlightUrgentRenewals && customer.isRenewalUrgent}
+                isRenewalUrgent={
+                  highlightUrgentRenewals && customer.isRenewalUrgent
+                }
                 isTopTen={highlightTopTen && customer.isTopTen}
                 onContextMenu={e => handleContextMenu(e, customer)}
               >
                 <Td align="center">{customer.rank}</Td>
                 <Td>
                   <CustomerNameCell>
-                    {highlightTopTen && customer.isTopTen && <StarIcon>⭐</StarIcon>}
+                    {highlightTopTen && customer.isTopTen && (
+                      <StarIcon>⭐</StarIcon>
+                    )}
                     <CustomerLink
                       className="customer-name"
                       clickable={enableDrilldown}
@@ -582,7 +661,9 @@ function SM24TopCustomersViz({
                     {customer.isExpansionCandidate && (
                       <span title="Expansion Candidate">🟢</span>
                     )}
-                    {customer.isDisengaged && <span title="Disengaged">🚩</span>}
+                    {customer.isDisengaged && (
+                      <span title="Disengaged">🚩</span>
+                    )}
                   </CustomerNameCell>
                 </Td>
                 <Td align="right">
@@ -590,11 +671,21 @@ function SM24TopCustomersViz({
                 </Td>
                 <Td align="right">
                   <GrowthCell
-                    positive={customer.arrGrowthMom !== null && customer.arrGrowthMom > 0}
-                    negative={customer.arrGrowthMom !== null && customer.arrGrowthMom < 0}
+                    positive={
+                      customer.arrGrowthMom !== null &&
+                      customer.arrGrowthMom > 0
+                    }
+                    negative={
+                      customer.arrGrowthMom !== null &&
+                      customer.arrGrowthMom < 0
+                    }
                   >
-                    {customer.arrGrowthMom !== null && customer.arrGrowthMom > 0 && '↑'}
-                    {customer.arrGrowthMom !== null && customer.arrGrowthMom < 0 && '↓'}
+                    {customer.arrGrowthMom !== null &&
+                      customer.arrGrowthMom > 0 &&
+                      '↑'}
+                    {customer.arrGrowthMom !== null &&
+                      customer.arrGrowthMom < 0 &&
+                      '↓'}
                     {formatPercent(customer.arrGrowthMom)}
                   </GrowthCell>
                 </Td>
@@ -641,7 +732,9 @@ function SM24TopCustomersViz({
                 </Td>
                 <Td align="center">
                   {customer.npsScore !== null ? (
-                    <NpsBadge score={customer.npsScore}>{customer.npsScore}</NpsBadge>
+                    <NpsBadge score={customer.npsScore}>
+                      {customer.npsScore}
+                    </NpsBadge>
                   ) : (
                     '—'
                   )}
@@ -658,7 +751,9 @@ function SM24TopCustomersViz({
           <FooterStats>
             <FooterStat>
               <FooterStatLabel>Total ARR</FooterStatLabel>
-              <FooterStatValue>{formatCurrency(summary.totalARR)}</FooterStatValue>
+              <FooterStatValue>
+                {formatCurrency(summary.totalARR)}
+              </FooterStatValue>
             </FooterStat>
             <FooterStat>
               <FooterStatLabel>Customers</FooterStatLabel>
@@ -669,10 +764,10 @@ function SM24TopCustomersViz({
               <FooterStatValue
                 color={
                   summary.averageHealthScore >= 80
-                    ? '#27AE60'
+                    ? theme.colors.success.base
                     : summary.averageHealthScore >= 60
-                    ? '#F1C40F'
-                    : '#E74C3C'
+                      ? theme.colors.warning.base
+                      : theme.colors.error.base
                 }
               >
                 {summary.averageHealthScore.toFixed(0)}
@@ -680,7 +775,13 @@ function SM24TopCustomersViz({
             </FooterStat>
             <FooterStat>
               <FooterStatLabel>At Risk</FooterStatLabel>
-              <FooterStatValue color={summary.customersAtRisk > 0 ? '#E74C3C' : '#27AE60'}>
+              <FooterStatValue
+                color={
+                  summary.customersAtRisk > 0
+                    ? theme.colors.error.base
+                    : theme.colors.success.base
+                }
+              >
                 {summary.customersAtRisk}
               </FooterStatValue>
             </FooterStat>
