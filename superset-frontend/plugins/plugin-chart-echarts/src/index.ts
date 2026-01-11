@@ -45,6 +45,7 @@ export { default as SM24BigNumberChartPlugin } from './SM24BigNumber';
 export { default as SM24MonthlyARRBreakdownChartPlugin } from './SM24MonthlyARRBreakdown';
 export { default as SM24TopBigNumberChartPlugin } from './SM24TopBigNumber';
 export { default as SM24TopCustomersChartPlugin } from './SM24TopCustomers';
+export { default as SM24StatusFunnelChartPlugin } from './SM24StatusFunnel';
 export { default as EchartsSunburstChartPlugin } from './Sunburst';
 export { default as EchartsBubbleChartPlugin } from './Bubble';
 export { default as EchartsSankeyChartPlugin } from './Sankey';
