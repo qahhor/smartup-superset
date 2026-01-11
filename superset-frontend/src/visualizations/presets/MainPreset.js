@@ -69,6 +69,7 @@ import {
   BigNumberPeriodOverPeriodChartPlugin,
   EchartsHeatmapChartPlugin,
   EchartsGanttChartPlugin,
+  SM24ARRTrendChartPlugin,
   SM24BigNumberChartPlugin,
   SM24TopBigNumberChartPlugin,
 } from '@superset-ui/plugin-chart-echarts';
@@ -108,6 +109,9 @@ export default class MainPreset extends Preset {
         new BigNumberChartPlugin().configure({ key: VizType.BigNumber }),
         new BigNumberTotalChartPlugin().configure({
           key: VizType.BigNumberTotal,
+        }),
+        new SM24ARRTrendChartPlugin().configure({
+          key: VizType.SM24ARRTrend,
         }),
         new SM24BigNumberChartPlugin().configure({
           key: VizType.SM24BigNumber,
