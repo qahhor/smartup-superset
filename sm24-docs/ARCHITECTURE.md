@@ -685,17 +685,145 @@ test('formats currency correctly', () => {
 9. Добавить export в `index.ts`
 10. Зарегистрировать в `MainPreset.js`
 
-### 10.2 Общие утилиты
+### 10.2 Общие утилиты — SM24Utils
 
-Рекомендуется вынести общий код:
+Общий код вынесен в модуль `SM24Utils/`:
 
 ```
 SM24Utils/
-├── formatters.ts     # Number/currency formatting
-├── colors.ts         # Color utilities
-├── locale.ts         # Localization helpers
-└── calculations.ts   # Business calculations
+├── index.ts          # Main exports
+├── types.ts          # Shared TypeScript interfaces
+├── locales.ts        # Currency configs, scale labels, number locales
+├── formatting.ts     # Number/currency/date formatting
+├── colors.ts         # Color palettes and utilities
+└── comparison.ts     # Trend calculations, ARR metrics
 ```
+
+#### Использование SM24Utils
+
+```typescript
+import {
+  // Types
+  TrendDirection,
+  ComparisonColorScheme,
+  CurrencyConfig,
+
+  // Locales
+  DEFAULT_CURRENCY_CONFIGS,
+  getScaleLabels,
+
+  // Formatting
+  formatFullAmount,
+  formatPercent,
+  formatGrowthPercent,
+
+  // Colors
+  getTrendColor,
+  getGrowthColor,
+  getStatusColor,
+
+  // Comparison
+  calculateComparison,
+  getTrendDirection,
+  calculateNetNewARR,
+} from '../SM24Utils';
+```
+
+#### Примеры использования
+
+```typescript
+// Форматирование валюты
+const formatted = formatFullAmount(1500000, {
+  locale: 'ru-RU',
+  currencyCode: 'RUB',
+}); // "1,5 млн. ₽"
+
+// Цвет тренда
+const color = getTrendColor('up', ComparisonColorScheme.GreenUp, {
+  colorSuccess: theme.colors.success.base,
+  colorError: theme.colors.error.base,
+  colorTextTertiary: theme.colors.text.label,
+});
+
+// Расчёт сравнения
+const comparison = calculateComparison(120, 100);
+// { currentValue: 120, previousValue: 100, absoluteDifference: 20, percentDifference: 0.2, trend: 'up' }
+```
+
+---
+
+## 11. SM24Utils Module Reference
+
+### 11.1 Types (`types.ts`)
+
+| Type | Description |
+|------|-------------|
+| `TrendDirection` | `'up' \| 'down' \| 'neutral'` |
+| `ComparisonColorScheme` | Enum: `GreenUp`, `RedUp` |
+| `TimeComparisonPeriod` | `'DoD' \| 'WoW' \| 'MoM' \| 'QoQ' \| 'YoY' \| 'custom' \| 'none'` |
+| `CurrencyConfig` | Currency configuration interface |
+| `ScaleLabels` | K/M/B suffixes for locale |
+| `GrowthThreshold` | Growth rate thresholds |
+| `HealthLevel` | `'excellent' \| 'good' \| 'warning' \| 'critical'` |
+| `RiskLevel` | `'critical' \| 'high' \| 'medium' \| 'low' \| 'none'` |
+
+### 11.2 Locales (`locales.ts`)
+
+| Export | Description |
+|--------|-------------|
+| `DEFAULT_CURRENCY_CONFIGS` | UZS, USD, EUR, RUB, GBP, CNY, KZT |
+| `DEFAULT_SCALE_LABELS` | K/M/B by locale (en, ru, uz) |
+| `SM24_NUMBER_LOCALES` | Full number locale configs |
+| `TIME_COMPARISON_LABELS` | DoD/WoW/MoM/QoQ/YoY labels |
+| `getCurrencyConfig(code)` | Get currency by ISO code |
+| `getScaleLabels(locale)` | Get K/M/B labels |
+| `getIntlLocale(locale)` | Normalize to Intl locale |
+
+### 11.3 Formatting (`formatting.ts`)
+
+| Function | Description |
+|----------|-------------|
+| `formatCount(value, locale)` | Format with K/M/B suffix |
+| `formatAmount(value, options)` | Format amount with scale |
+| `formatFullAmount(value, options)` | Full currency string |
+| `formatARRValue(value, locale)` | ARR-specific formatting |
+| `formatPercent(value, options)` | Percentage formatting |
+| `formatGrowthPercent(value)` | Growth with +/- sign |
+| `formatTenure(months, locale)` | "2y 3mo" format |
+| `formatDaysAgo(days, locale)` | "5d ago" format |
+| `createCurrencyFormatter(locale, code)` | Factory function |
+
+### 11.4 Colors (`colors.ts`)
+
+| Export | Description |
+|--------|-------------|
+| `SM24_COLORS` | Primary color palette |
+| `ARR_COLORS` | ARR component colors |
+| `GROWTH_COLORS` | Growth rate colors |
+| `HEALTH_COLORS` | Health level colors |
+| `RISK_COLORS` | Risk level colors |
+| `getTrendColor(trend, scheme, theme)` | Get trend color |
+| `getGrowthColor(rate, thresholds)` | Growth color |
+| `getStatusColor(status, index, total)` | Status color |
+| `getTintedBackground(hex, opacity)` | Tinted background |
+| `lightenColor(hex, percent)` | Lighten color |
+| `getContrastTextColor(bg)` | Contrasting text |
+
+### 11.5 Comparison (`comparison.ts`)
+
+| Function | Description |
+|----------|-------------|
+| `getTrendDirection(percentDiff)` | Get trend from diff |
+| `getTrendIcon(trend)` | Get ↑/↓/→ icon |
+| `calculateComparison(current, previous)` | Full comparison data |
+| `calculateMoMGrowth(current, previous)` | MoM percentage |
+| `calculateNetNewARR(...)` | Net New ARR |
+| `calculateQuickRatio(...)` | Quick Ratio metric |
+| `calculateGRR(...)` | Gross Revenue Retention |
+| `calculateNRR(...)` | Net Revenue Retention |
+| `getHealthLevel(score)` | Health from score |
+| `calculateRiskLevel(...)` | Risk assessment |
+| `generateProjection(...)` | ARR projection |
 
 ---
 

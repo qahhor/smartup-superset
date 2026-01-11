@@ -1,6 +1,6 @@
 # SM24 Visualization Components for Apache Superset
 
-> **Версия**: 1.0.0
+> **Версия**: 1.1.0
 > **Автор**: Smartup24
 > **Совместимость**: Apache Superset 4.x+
 
@@ -12,13 +12,29 @@ SM24 — это набор из 7 специализированных визу�
 
 | Компонент | Тип | Назначение | Статус |
 |-----------|-----|------------|--------|
-| [SM24-BigNumber](./components/SM24-BigNumber.md) | ECharts | Большое число с KPI, сравнениями и трендом | ✅ Production |
+| [SM24-BigNumberPro](./components/SM24-BigNumberPro.md) | ECharts | Большое число с KPI, сравнениями и трендом | ✅ Production |
 | [SM24-TopBigNumber](./components/SM24-TopBigNumber.md) | ECharts | Мульти-KPI карточки (2-6 метрик) | ✅ Production |
 | [SM24-ARRTrend](./components/SM24-ARRTrend.md) | ECharts | Mixed Chart для ARR с YoY сравнением | ✅ Production |
-| [SM24-ARRWaterfall](./components/SM24-ARRWaterfall.md) | ECharts | Waterfall ARR: New → Expansion → Churn | ✅ Production |
+| [SM24-MetricWaterfall](./components/SM24-MetricWaterfall.md) | ECharts | Универсальный waterfall для метрик | ✅ Production |
 | [SM24-MonthlyARRBreakdown](./components/SM24-MonthlyARRBreakdown.md) | ECharts | Горизонтальные бары по продуктам/сегментам | ✅ Production |
 | [SM24-TopCustomers](./components/SM24-TopCustomers.md) | Custom | Таблица топ клиентов с health-индикаторами | ✅ Production |
-| [SM24-StatusFunnel](./components/SM24-StatusFunnel.md) | Custom | Универсальная воронка статусов | ✅ Production |
+| [SM24-StatusCardFlow](./components/SM24-StatusCardFlow.md) | Custom | Универсальный поток статусов карточками | ✅ Production |
+
+## Shared Utilities — SM24Utils
+
+Общие утилиты для всех компонентов вынесены в модуль `SM24Utils/`:
+
+```typescript
+import {
+  formatFullAmount,    // Форматирование с валютой
+  formatPercent,       // Форматирование процентов
+  getTrendColor,       // Цвет тренда
+  calculateComparison, // Расчёт сравнения
+  DEFAULT_CURRENCY_CONFIGS, // UZS, USD, EUR, RUB
+} from '../SM24Utils';
+```
+
+Подробнее: [ARCHITECTURE.md](./ARCHITECTURE.md#11-sm24utils-module-reference)
 
 ## Быстрый старт
 
@@ -74,9 +90,10 @@ sm24-docs/
 | Apache License Headers | ✅ Pass |
 | TypeScript Only | ✅ Pass |
 | @superset-ui/core | ✅ Pass |
-| No `any` types | ⚠️ 7 issues |
-| i18n Compliance | ⚠️ Partial |
-| Test Coverage | ❌ Missing |
+| No `any` types | ✅ Fixed |
+| Shared Utilities | ✅ SM24Utils |
+| i18n Compliance | ✅ Configurable |
+| Test Coverage | ⚠️ Pending |
 
 Подробнее: [AUDIT-REPORT.md](./AUDIT-REPORT.md)
 
