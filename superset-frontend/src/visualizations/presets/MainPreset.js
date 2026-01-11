@@ -74,6 +74,7 @@ import {
   SM24BigNumberChartPlugin,
   SM24MonthlyARRBreakdownChartPlugin,
   SM24TopBigNumberChartPlugin,
+  SM24TopCustomersChartPlugin,
 } from '@superset-ui/plugin-chart-echarts';
 import {
   SelectFilterPlugin,
@@ -126,6 +127,9 @@ export default class MainPreset extends Preset {
         }),
         new SM24TopBigNumberChartPlugin().configure({
           key: VizType.SM24TopBigNumber,
+        }),
+        new SM24TopCustomersChartPlugin().configure({
+          key: VizType.SM24TopCustomers,
         }),
         new EchartsBoxPlotChartPlugin().configure({ key: VizType.BoxPlot }),
         new BubbleChartPlugin().configure({ key: VizType.LegacyBubble }),
