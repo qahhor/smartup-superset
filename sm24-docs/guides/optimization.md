@@ -412,3 +412,74 @@ export interface SM24CustomerListFormData extends SM24BaseFormData {
 | ARRTrend | ~300 lines | ~200 lines |
 
 **Reduction**: 40-50% through component extraction and shared utilities.
+
+---
+
+## Theme Optimization
+
+### Current State
+
+SM24 theme system created in `SM24Utils/theme.ts`:
+- ✅ `SM24_THEME_TOKENS` - Ant Design token configuration
+- ✅ `SM24_DARK_THEME_TOKENS` - Dark mode support
+- ✅ `SM24_SEMANTIC_COLORS` - Domain-specific colors
+- ✅ `SM24_ECHARTS_THEME` - Chart theming
+
+### Issues Found
+
+**Hardcoded colors in components:**
+
+```typescript
+// SM24TopCustomersViz.tsx - Examples of hardcoded colors
+background: #fff;           // Should use theme token
+border: 1px solid #eee;     // Should use theme token
+color: #3498db;             // Should use SM24_COLORS.primary
+border-color: #f1c40f;      // Should use HEALTH_COLORS.good
+```
+
+### Theme Migration Guide
+
+**Step 1: Import SM24 utilities**
+```typescript
+import { SM24_COLORS, HEALTH_COLORS, RISK_COLORS } from '../SM24Utils';
+```
+
+**Step 2: Replace hardcoded colors**
+
+| Hardcoded | Replace With |
+|-----------|--------------|
+| `#fff` | `theme.colors.grayscale.light5` |
+| `#eee`, `#ddd` | `theme.colors.grayscale.light3` |
+| `#3498db` | `SM24_COLORS.primary` |
+| `#27AE60` | `SM24_COLORS.success` |
+| `#E74C3C` | `SM24_COLORS.error` |
+| `#F39C12` | `SM24_COLORS.warning` |
+| `#2c3e50` | `SM24_COLORS.neutral800` |
+
+**Step 3: Use theme props in styled-components**
+```typescript
+const Container = styled.div`
+  // Before
+  background: #f8f9fa;
+
+  // After
+  background: ${({ theme }) => theme.colors.grayscale.light4};
+`;
+```
+
+### Priority Files for Theme Migration
+
+| File | Hardcoded Colors | Priority |
+|------|------------------|----------|
+| SM24TopCustomersViz.tsx | 20+ | 🔴 High |
+| SM24ARRTrendViz.tsx | 5-10 | 🟠 Medium |
+| SM24StatusCardFlowViz.tsx | 5-10 | 🟠 Medium |
+| SM24CustomerProfileViz.tsx | 3-5 | 🟢 Low |
+
+### Theme Integration Checklist
+
+- [ ] Use `useTheme()` hook in all Viz components
+- [ ] Replace hardcoded hex colors with theme tokens
+- [ ] Use `SM24_SEMANTIC_COLORS` for business logic colors
+- [ ] Test dark mode compatibility
+- [ ] Update ECharts themes to use SM24_ECHARTS_THEME

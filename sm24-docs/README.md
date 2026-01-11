@@ -54,10 +54,12 @@ ORDER BY 1
 superset-frontend/plugins/plugin-chart-echarts/src/
 ├── SM24Utils/                    # Shared utilities module
 │   ├── types.ts                 # Common types
+│   ├── theme.ts                 # Theme configuration (NEW)
 │   ├── locales.ts               # Multi-locale configs
 │   ├── formatting.ts            # Number/currency formatters
 │   ├── colors.ts                # Color palettes
-│   └── comparison.ts            # Trend calculations
+│   ├── comparison.ts            # Trend calculations
+│   └── index.ts                 # Unified exports
 │
 ├── SM24ARRTrend/                # Component
 │   ├── types.ts                 # Component types
@@ -69,6 +71,30 @@ superset-frontend/plugins/plugin-chart-echarts/src/
 │
 └── ... (other SM24 components follow same structure)
 ```
+
+## Theme System
+
+SM24 использует интегрированную систему тем:
+
+```typescript
+import {
+  SM24_THEME_TOKENS,      // Ant Design tokens
+  SM24_SEMANTIC_COLORS,   // Domain-specific colors
+  SM24_ECHARTS_THEME,     // Chart theming
+} from '../SM24Utils';
+```
+
+### Color Palettes
+
+| Palette | Usage |
+|---------|-------|
+| `SM24_COLORS` | Primary brand colors |
+| `ARR_COLORS` | Revenue visualization |
+| `HEALTH_COLORS` | Customer health scores |
+| `RISK_COLORS` | Churn risk indicators |
+| `SEGMENT_COLORS` | Customer segments |
+
+See [Theme Guide](./guides/theme.md) for complete documentation.
 
 ## Feature Matrix
 
@@ -116,11 +142,10 @@ See [sql-examples/](./sql-examples/) for complete SQL templates:
 
 ## Guides
 
-- [Getting Started](./guides/getting-started.md)
-- [Data Requirements](./guides/data-requirements.md)
-- [Customization](./guides/customization.md)
-- [Optimization](./guides/optimization.md)
-- [Best Practices](./guides/best-practices.md)
+- [Theme Guide](./guides/theme.md) - Theme system and customization
+- [Optimization](./guides/optimization.md) - Performance and universalization
+- [Best Practices](./guides/best-practices.md) - Development standards
+- [Analysis Report](./guides/analysis-report.md) - Full technical analysis
 
 ## Technical Compliance
 

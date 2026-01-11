@@ -178,6 +178,31 @@ export {
 } from './colors';
 
 // =============================================================================
+// THEME
+// =============================================================================
+
+export {
+  // Theme tokens
+  SM24_THEME_TOKENS,
+  SM24_DARK_THEME_TOKENS,
+
+  // Semantic colors
+  SM24_SEMANTIC_COLORS,
+
+  // ECharts theme
+  SM24_ECHARTS_THEME,
+
+  // Theme utilities
+  getThemeColor,
+  createSM24ThemeContext,
+
+  // Theme types
+  SM24ThemeTokens,
+  SM24SemanticColors,
+  SM24EChartsTheme,
+} from './theme';
+
+// =============================================================================
 // COMPARISON
 // =============================================================================
 
