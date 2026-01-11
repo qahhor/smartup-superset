@@ -168,6 +168,35 @@ export interface ActiveAlert {
 }
 
 // =============================================================================
+// CONDITIONAL FORMATTING
+// =============================================================================
+
+/**
+ * Conditional formatting rule for color coding values
+ */
+export interface ConditionalFormattingRule {
+  operator: '<' | '<=' | '>' | '>=' | '==' | '!=' | 'between';
+  targetValue: number;
+  targetValueUpper?: number; // For 'between' operator
+  color: { r: number; g: number; b: number; a: number };
+}
+
+// =============================================================================
+// CURRENCY FORMAT
+// =============================================================================
+
+/**
+ * Currency format configuration
+ */
+export interface CurrencyFormatConfig {
+  symbol: string;           // '$', '€', 'сум', '₽'
+  symbolPosition: 'prefix' | 'suffix';
+  decimalPlaces: number;
+  thousandsSeparator: string;
+  decimalSeparator: string;
+}
+
+// =============================================================================
 // FORM DATA
 // =============================================================================
 
@@ -197,7 +226,7 @@ export type SM24BigNumberProFormData = QueryFormData & {
 
   // Color thresholds
   defaultColor?: { r: number; g: number; b: number; a: number };
-  conditionalFormatting?: any[];
+  conditionalFormatting?: ConditionalFormattingRule[];
 
   // Time comparison
   timeComparisonEnabled?: boolean;
@@ -234,7 +263,7 @@ export type SM24BigNumberProFormData = QueryFormData & {
   animationDuration?: number;
 
   // Currency
-  currencyFormat?: any;
+  currencyFormat?: CurrencyFormatConfig;
   yAxisFormat?: string;
 
   // Time filter for comparison

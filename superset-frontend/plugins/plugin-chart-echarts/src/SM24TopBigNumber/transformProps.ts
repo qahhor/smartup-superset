@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { getMetricLabel } from '@superset-ui/core';
+import { getMetricLabel, DataRecord } from '@superset-ui/core';
 import {
   SM24TopBigNumberChartProps,
   SM24TopBigNumberVizProps,
@@ -131,7 +131,7 @@ function colorToString(color: { r: number; g: number; b: number; a: number } | u
  * Extract comparison value from data
  */
 function extractComparisonValue(
-  data: any[],
+  data: DataRecord[],
   metricName: string,
   timeShift: string,
 ): number | null {

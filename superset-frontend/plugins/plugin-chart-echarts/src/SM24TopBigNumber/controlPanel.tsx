@@ -24,6 +24,7 @@ import {
   CustomControlItem,
   ControlPanelSectionConfig,
 } from '@superset-ui/chart-controls';
+import { SM24TopBigNumberFormData } from './types';
 
 // =============================================================================
 // OPTIONS
@@ -421,7 +422,7 @@ export default {
     colorsSectionConfig,
   ],
   controlOverrides: {},
-  formDataOverrides: (formData: any) => ({
+  formDataOverrides: (formData: SM24TopBigNumberFormData) => ({
     ...formData,
     metrics: getStandardizedControls().popAllMetrics(),
   }),

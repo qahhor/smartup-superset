@@ -24,6 +24,7 @@ import {
 import {
   getMetricLabel,
   getNumberFormatter,
+  DataRecord,
 } from '@superset-ui/core';
 import {
   SM24BigNumberProChartProps,
@@ -251,7 +252,7 @@ function calculateComparisonData(
  * Extract comparison value from data
  */
 function extractComparisonValue(
-  data: any[],
+  data: DataRecord[],
   metricName: string,
   timeShift: string,
 ): number | null {

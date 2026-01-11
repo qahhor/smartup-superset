@@ -26,6 +26,7 @@ import {
   CustomControlItem,
   ControlPanelSectionConfig,
 } from '@superset-ui/chart-controls';
+import { SM24BigNumberProFormData } from './types';
 
 // =============================================================================
 // OPTIONS
@@ -595,7 +596,7 @@ export default {
       label: t('Number format'),
     },
   },
-  formDataOverrides: (formData: any) => ({
+  formDataOverrides: (formData: SM24BigNumberProFormData) => ({
     ...formData,
     metric: getStandardizedControls().shiftMetric(),
   }),

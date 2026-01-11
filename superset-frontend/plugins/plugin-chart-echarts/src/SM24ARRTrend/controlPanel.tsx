@@ -24,7 +24,7 @@ import {
   ControlPanelSectionConfig,
   sharedControls,
 } from '@superset-ui/chart-controls';
-import { ARR_COLORS } from './types';
+import { ARR_COLORS, SM24ARRTrendFormData } from './types';
 
 // =============================================================================
 // OPTIONS
@@ -518,7 +518,7 @@ export default {
     interactivitySectionConfig,
   ],
   controlOverrides: {},
-  formDataOverrides: (formData: any) => ({
+  formDataOverrides: (formData: SM24ARRTrendFormData) => ({
     ...formData,
   }),
 } as ControlPanelConfig;
