@@ -16,7 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { QueryFormData, ChartProps } from '@superset-ui/core';
+import {
+  QueryFormData,
+  ChartProps,
+  BinaryQueryObjectFilterClause,
+} from '@superset-ui/core';
+import { ContextMenuFilters, Refs } from '../types';
 
 // =============================================================================
 // CUSTOMER DATA TYPES
@@ -286,10 +291,18 @@ export interface SM24TopCustomersVizProps {
   onSearch?: (query: string) => void;
   onRowSelect?: (customerIds: string[]) => void;
 
+  // Context menu drilldown
+  onContextMenu?: (
+    clientX: number,
+    clientY: number,
+    filters?: ContextMenuFilters,
+  ) => void;
+
+  // Form data for building drill filters
+  formData: SM24TopCustomersFormData;
+
   // Refs
-  refs?: {
-    tableRef?: { current: unknown };
-  };
+  refs: Refs;
 }
 
 // =============================================================================

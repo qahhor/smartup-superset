@@ -16,8 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { useCallback, useMemo, useState } from 'react';
-import { styled } from '@superset-ui/core';
+import { useCallback, useMemo, useState, MouseEvent } from 'react';
+import { styled, BinaryQueryObjectFilterClause } from '@superset-ui/core';
 import {
   SM24TopCustomersVizProps,
   CustomerData,
@@ -324,6 +324,8 @@ function SM24TopCustomersViz({
   enableQuickActions,
   enableExport,
   onDrilldown,
+  onContextMenu,
+  formData,
 }: SM24TopCustomersVizProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortColumn, setSortColumn] = useState<string>('totalArr');
@@ -411,6 +413,79 @@ function SM24TopCustomersViz({
     [enableDrilldown, onDrilldown],
   );
 
+  // Handle context menu for Superset drilldown
+  const handleContextMenu = useCallback(
+    (event: MouseEvent<HTMLTableRowElement>, customer: CustomerData) => {
+      if (!onContextMenu) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      // Build drillToDetail filters
+      const drillToDetailFilters: BinaryQueryObjectFilterClause[] = [];
+
+      // Add customer ID filter if column is configured
+      if (formData.customerIdColumn) {
+        drillToDetailFilters.push({
+          col: formData.customerIdColumn,
+          op: '==',
+          val: customer.customerId,
+          formattedVal: customer.customerId,
+        });
+      }
+
+      // Add customer name filter
+      if (formData.customerNameColumn) {
+        drillToDetailFilters.push({
+          col: formData.customerNameColumn,
+          op: '==',
+          val: customer.customerName,
+          formattedVal: customer.customerName,
+        });
+      }
+
+      // Build drillBy filters for groupby columns
+      const groupby = formData.groupby || [];
+      const drillByFilters: BinaryQueryObjectFilterClause[] = [];
+
+      if (groupby.length > 0) {
+        if (formData.customerIdColumn && groupby.includes(formData.customerIdColumn)) {
+          drillByFilters.push({
+            col: formData.customerIdColumn,
+            op: '==',
+            val: customer.customerId,
+          });
+        }
+        if (formData.industryColumn && groupby.includes(formData.industryColumn)) {
+          drillByFilters.push({
+            col: formData.industryColumn,
+            op: '==',
+            val: customer.industry,
+          });
+        }
+        if (formData.regionColumn && groupby.includes(formData.regionColumn)) {
+          drillByFilters.push({
+            col: formData.regionColumn,
+            op: '==',
+            val: customer.region,
+          });
+        }
+      }
+
+      onContextMenu(event.clientX, event.clientY, {
+        drillToDetail: drillToDetailFilters,
+        drillBy:
+          groupby.length > 0
+            ? {
+                filters: drillByFilters,
+                groupbyFieldName: 'groupby',
+              }
+            : undefined,
+      });
+    },
+    [onContextMenu, formData],
+  );
+
   // Render sort indicator
   const renderSortIndicator = (column: string) => {
     if (sortColumn !== column) return null;
@@ -488,6 +563,7 @@ function SM24TopCustomersViz({
                 isAtRisk={highlightAtRisk && customer.isAtRisk}
                 isRenewalUrgent={highlightUrgentRenewals && customer.isRenewalUrgent}
                 isTopTen={highlightTopTen && customer.isTopTen}
+                onContextMenu={e => handleContextMenu(e, customer)}
               >
                 <Td align="center">{customer.rank}</Td>
                 <Td>

@@ -36,14 +36,18 @@ import {
   daysSince,
 } from './types';
 
+import { Refs } from '../types';
+
 /**
  * Transform chart props to visualization props
  */
 export default function transformProps(
   chartProps: ChartProps,
 ): SM24TopCustomersVizProps {
-  const { width, height, formData, queriesData } = chartProps;
+  const { width, height, formData, queriesData, hooks } = chartProps;
+  const { onContextMenu } = hooks || {};
   const data = queriesData[0]?.data || [];
+  const refs: Refs = {};
 
   const {
     // Thresholds
@@ -216,7 +220,7 @@ export default function transformProps(
     height,
     customers,
     summary,
-    companyTotalARR: totalARR, // Would ideally come from a separate query
+    companyTotalARR: totalARR,
     columns: DEFAULT_COLUMNS,
     rowsPerPage,
     enableSearch,
@@ -235,5 +239,8 @@ export default function transformProps(
     enableDrilldown,
     enableQuickActions,
     enableExport,
+    onContextMenu,
+    formData: formData as SM24TopCustomersFormData,
+    refs,
   };
 }
