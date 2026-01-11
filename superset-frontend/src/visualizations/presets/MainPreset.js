@@ -72,6 +72,7 @@ import {
   SM24ARRTrendChartPlugin,
   SM24ARRWaterfallChartPlugin,
   SM24BigNumberChartPlugin,
+  SM24MonthlyARRBreakdownChartPlugin,
   SM24TopBigNumberChartPlugin,
 } from '@superset-ui/plugin-chart-echarts';
 import {
@@ -119,6 +120,9 @@ export default class MainPreset extends Preset {
         }),
         new SM24BigNumberChartPlugin().configure({
           key: VizType.SM24BigNumber,
+        }),
+        new SM24MonthlyARRBreakdownChartPlugin().configure({
+          key: VizType.SM24MonthlyARRBreakdown,
         }),
         new SM24TopBigNumberChartPlugin().configure({
           key: VizType.SM24TopBigNumber,

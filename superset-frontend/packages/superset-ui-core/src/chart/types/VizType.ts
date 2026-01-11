@@ -54,6 +54,7 @@ export enum VizType {
   SM24ARRTrend = 'sm24_arr_trend',
   SM24ARRWaterfall = 'sm24_arr_waterfall',
   SM24BigNumber = 'sm24_big_number',
+  SM24MonthlyARRBreakdown = 'sm24_monthly_arr_breakdown',
   SM24TopBigNumber = 'sm24_top_big_number',
   SmoothLine = 'echarts_timeseries_smooth',
   Step = 'echarts_timeseries_step',
