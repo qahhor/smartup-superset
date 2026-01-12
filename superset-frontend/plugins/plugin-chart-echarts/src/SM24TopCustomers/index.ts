@@ -25,8 +25,8 @@ import {
   SM24TopCustomersFormData,
 } from './types';
 
-// Reuse Table thumbnails
-import thumbnail from '../BigNumber/images/thumbnail.png';
+// Reuse BigNumber thumbnails
+import thumbnail from '../BigNumber/BigNumberTotal/images/thumbnail.png';
 
 const metadata = {
   category: t('Table'),

@@ -25,7 +25,7 @@ import { EchartsChartPlugin } from '../types';
 
 // Placeholder thumbnails - reuse MixedTimeSeries thumbnails
 import thumbnail from '../MixedTimeseries/images/thumbnail.png';
-import thumbnailDark from '../MixedTimeseries/images/thumbnailDark.png';
+import thumbnailDark from '../MixedTimeseries/images/thumbnail-dark.png';
 
 const metadata = {
   category: t('Evolution'),
